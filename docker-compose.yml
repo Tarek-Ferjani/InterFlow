@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: interflow_db
+    restart: always
+    environment:
+      POSTGRES_DB: interflow_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ChangeMeSuperSecurePassword123!
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d interflow_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Application Web (Express + React + Drizzle)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: interflow_app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SQL_HOST=postgres
+      - SQL_PORT=5432
+      - SQL_DB_NAME=interflow_db
+      - SQL_USER=postgres
+      - SQL_PASSWORD=ChangeMeSuperSecurePassword123!
+
+volumes:
+  postgres_data:

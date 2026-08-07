@@ -1,0 +1,6 @@
+{
+  "name": "InterFlow - Plateforme Intercontrat & Staffing IA",
+  "description": "Transformez chaque intercontrat en opportunité de carrière avec l'IA Power Platform, matching missions, CV builder et Copilot RH.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
