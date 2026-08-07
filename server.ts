@@ -7,8 +7,22 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Safely derive __dirname in both CJS (esbuild bundled production) and ESM (tsx dev)
+const getDirname = () => {
+  if (typeof __dirname !== 'undefined' && __dirname) {
+    return __dirname;
+  }
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta && import.meta.url) {
+      return path.dirname(fileURLToPath(import.meta.url));
+    }
+  } catch (e) {
+    // Ignore error if import.meta.url is invalid
+  }
+  return process.cwd();
+};
+
+const currentDir = getDirname();
 
 const app = express();
 const PORT = 3000;
@@ -317,7 +331,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(__dirname, 'dist');
+    const distPath = currentDir.endsWith('dist') ? currentDir : path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
