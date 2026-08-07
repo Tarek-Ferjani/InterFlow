@@ -107,10 +107,18 @@ Le fichier `docker-compose.yml` orchestre deux conteneurs :
 - **`interflow_db`** : Base de données PostgreSQL 16 Alpine persistante.
 - **`interflow_app`** : Application web full-stack Node.js/Express/React (port `3000`).
 
-### 2. Commande de Lancement
-```bash
-docker-compose up -d --build
-```
+### 2. Commandes de Lancement (Ubuntu / VM)
+
+1. **Création du réseau partagé** *(nécessaire si `shared_network` est externe)* :
+   ```bash
+   docker network create shared_network
+   ```
+
+2. **Lancement de l'application (Docker Compose V2)** :
+   ```bash
+   docker compose up -d --build
+   ```
+   *(Si vous utilisez l'ancienne version V1 `docker-compose`, nous vous recommandons d'installer le plugin V2 avec `apt-get install docker-compose-plugin` pour éviter les erreurs d'inspection d'images).*
 
 ### 3. Accès
 - **Application Web** : `http://<IP_DE_VOTRE_VM>:3000`
