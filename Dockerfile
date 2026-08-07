@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copie des fichiers de dépendances
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 # Copie du code source
 COPY . .
@@ -26,7 +26,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
 # Installation des dépendances de prod uniquement
-RUN npm ci --only=production
+RUN npm install
 
 EXPOSE 3000
 
