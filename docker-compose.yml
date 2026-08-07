@@ -19,6 +19,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   # Application Web (Express + React + Drizzle)
   app:
@@ -33,14 +35,20 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - SQL_HOST=postgres
-      - SQL_PORT=5432
-      - SQL_DB_NAME=interflow_db
-      - SQL_USER=postgres
-      - SQL_PASSWORD=ChangeMeSuperSecurePassword123!
+      NODE_ENV: production
+      PORT: 3000
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SQL_HOST: postgres
+      SQL_PORT: 5432
+      SQL_DB_NAME: interflow_db
+      SQL_USER: postgres
+      SQL_PASSWORD: ChangeMeSuperSecurePassword123!
+    networks:
+      - shared_network
 
 volumes:
   postgres_data:
+
+networks:
+  shared_network:
+    external: true
