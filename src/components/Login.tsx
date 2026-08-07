@@ -29,44 +29,51 @@ export const Login: React.FC<LoginProps> = ({ onLogin, isDarkMode, usersList }) 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
 
-    setTimeout(() => {
-      // Find matching user in the system or log in as Admin
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
+        setErrorMessage(data.error || 'Identifiants incorrects. Veuillez vérifier votre adresse email et votre mot de passe.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.status === 'success' && data.user) {
+        onLogin(data.user);
+      } else {
+        setErrorMessage('Erreur lors de la connexion. Veuillez réessayer.');
+      }
+    } catch (err: any) {
+      // Fallback in case backend server is unreachable
       const matched = activeUsersList.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
-      
       if (matched) {
-        // Authenticate as matched user with Admin privileges
         onLogin({
           ...matched,
-          role: 'Admin', // Admin privileges guaranteed for admin login portal
           status: 'Actif',
           lastLogin: 'En ce moment'
         });
       } else {
-        // Create new Admin session for new admin email
-        const emailParts = email.split('@')[0].split('.');
-        const prenom = emailParts[0] ? emailParts[0].charAt(0).toUpperCase() + emailParts[0].slice(1) : 'Admin';
-        const nom = emailParts[1] ? emailParts[1].charAt(0).toUpperCase() + emailParts[1].slice(1) : 'InterFlow';
-
-        onLogin({
-          id: `user-admin-${Date.now()}`,
-          nom,
-          prenom,
-          email: email.trim(),
-          role: 'Admin',
-          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=250',
-          title: 'Administrateur SI & Gouvernance InterFlow',
-          department: 'Direction des Systèmes d\'Information',
-          status: 'Actif',
-          lastLogin: 'En ce moment'
-        });
+        setErrorMessage('Erreur de connexion au serveur. Identifiants non reconnus.');
       }
+    } finally {
       setIsLoading(false);
-    }, 600);
+    }
   };
 
   return (

@@ -57,6 +57,20 @@ export default function App() {
   const [formations, setFormations] = useState<Formation[]>(INITIAL_FORMATIONS);
 
   useEffect(() => {
+    // Fetch users list from backend API on load
+    fetch('/api/users')
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success' && Array.isArray(data.users) && data.users.length > 0) {
+          setUsers(data.users);
+        }
+      })
+      .catch(() => {
+        // Fallback to localStorage or DEFAULT_USERS if API is temporarily unavailable
+      });
+  }, []);
+
+  useEffect(() => {
     if (currentUser) {
       localStorage.setItem('interflow_session', JSON.stringify(currentUser));
     } else {
@@ -93,20 +107,45 @@ export default function App() {
     setCurrentUser(null);
   };
 
-  const handleAddUser = (newUser: UserSession) => {
+  const handleAddUser = async (newUser: UserSession) => {
     setUsers(prev => [newUser, ...prev]);
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newUser)
+      });
+    } catch (err) {
+      console.warn('Backend create user endpoint warning:', err);
+    }
   };
 
-  const handleUpdateUser = (updatedUser: UserSession) => {
+  const handleUpdateUser = async (updatedUser: UserSession) => {
     setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
     if (currentUser?.id === updatedUser.id) {
       setCurrentUser(updatedUser);
       setCurrentRole(updatedUser.role);
     }
+    try {
+      await fetch(`/api/users/${updatedUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUser)
+      });
+    } catch (err) {
+      console.warn('Backend update user endpoint warning:', err);
+    }
   };
 
-  const handleDeleteUser = (userId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     setUsers(prev => prev.filter(u => u.id !== userId));
+    try {
+      await fetch(`/api/users/${userId}`, {
+        method: 'DELETE'
+      });
+    } catch (err) {
+      console.warn('Backend delete user endpoint warning:', err);
+    }
   };
 
   const handleUpdateConsultantCV = (score: number, _updatedKeywords: string[]) => {

@@ -171,6 +171,7 @@ export interface UserSession {
   nom: string;
   prenom: string;
   email: string;
+  password?: string;
   role: UserRole;
   avatar: string;
   title: string;

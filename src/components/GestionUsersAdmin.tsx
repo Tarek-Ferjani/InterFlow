@@ -109,6 +109,7 @@ export const GestionUsersAdmin: React.FC<GestionUsersAdminProps> = ({
     nom: '',
     prenom: '',
     email: '',
+    password: '',
     role: 'Consultant' as UserRole,
     title: '',
     department: 'Practice Cloud & Business Apps',
@@ -129,6 +130,7 @@ export const GestionUsersAdmin: React.FC<GestionUsersAdminProps> = ({
       nom: formData.nom,
       prenom: formData.prenom,
       email: formData.email,
+      password: formData.password || 'Password123!',
       role: formData.role,
       title: formData.title || `${formData.role} InterFlow`,
       department: formData.department,
@@ -143,6 +145,7 @@ export const GestionUsersAdmin: React.FC<GestionUsersAdminProps> = ({
       nom: '',
       prenom: '',
       email: '',
+      password: '',
       role: 'Consultant',
       title: '',
       department: 'Practice Cloud & Business Apps',
@@ -1103,6 +1106,19 @@ export const GestionUsersAdmin: React.FC<GestionUsersAdminProps> = ({
                   placeholder="t.martin@interflow-esn.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className={`w-full p-2.5 rounded-xl border focus:outline-none ${
+                    isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-300'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold mb-1">Mot de Passe Compte *</label>
+                <input
+                  type="password"
+                  placeholder="Password123! (par défaut)"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className={`w-full p-2.5 rounded-xl border focus:outline-none ${
                     isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-300'
                   }`}
