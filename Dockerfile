@@ -5,6 +5,8 @@ WORKDIR /app
 
 # Copie des fichiers de dépendances
 COPY package*.json ./
+
+# Installation des dépendances
 RUN npm ci
 
 # Copie du code source
@@ -21,12 +23,12 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Copie des artifacts compilés et du package.json
+# Copie des artefacts compilés et des dépendances
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
-# Installation des dépendances de prod uniquement
-RUN npm ci --only=production
+# Installation des dépendances de production uniquement
+RUN npm ci --omit=dev
 
 EXPOSE 3000
 
